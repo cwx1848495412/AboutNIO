@@ -113,7 +113,7 @@ public class Client {
         SocketChannel channel = (SocketChannel) key.channel();
         String msg = (String) key.attachment();
 
-        // 给客户端写回消息
+        // 给服务端写回消息
         String baskStr = new String(msg + "\n");
         ByteBuffer outBuffer = ByteBuffer.wrap(baskStr.getBytes("utf-8"));
         channel.write(outBuffer);
