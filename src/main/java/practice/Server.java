@@ -140,7 +140,9 @@ public class Server {
         byte[] data = buffer.array();
         String msg = new String(data).trim();
 
+        System.out.println("----------------------------------------------------");
         System.out.println("客户端消息：" + msg);
+        System.out.println("----------------------------------------------------");
         return msg;
     }
 
@@ -156,7 +158,7 @@ public class Server {
         String msg = (String) key.attachment();
 
         // 给客户端写回消息
-        String baskStr = new String("Server receive:" + msg + "\n");
+        String baskStr = new String(msg + "\n");
         ByteBuffer outBuffer = ByteBuffer.wrap(baskStr.getBytes("utf-8"));
         channel.write(outBuffer);
     }
