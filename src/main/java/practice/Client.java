@@ -22,15 +22,16 @@ public class Client {
         // 创建selector
         selector = Selector.open();
 
+        // 创建一个channel
         SocketChannel socketChannel = SocketChannel.open();
 
         // 配置非阻塞
         socketChannel.configureBlocking(false);
 
-        // 监听端口
+        // 监听端口 此时是异步的 可能并没有连接成功
         socketChannel.connect(new InetSocketAddress(hostname, port));
 
-        // 注册连接事件
+        // 关心连接事件
         socketChannel.register(selector, SelectionKey.OP_CONNECT);
     }
 
@@ -39,15 +40,22 @@ public class Client {
         initServer();
 
         while (true) {
+            // 本方法是非阻塞的
             selector.select();
 
+            // 拿到所有的事件
+            // 可能包含  OP_CONNECT OP_READ OP_WRITE
             Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
 
             while (iterator.hasNext()) {
                 SelectionKey key = iterator.next();
+                // selector 不会删除已经添加的事件
+                // 我们获取之后需要手动删除
+                // 不然此逻辑会重复消费
                 iterator.remove();
 
                 if (key.isConnectable()) {
+                    // 有连接事件触发 调用处理
                     connectHandler(key);
                 }
 
@@ -66,6 +74,11 @@ public class Client {
                     // 发送完了就取消写事件
                     // 否则下次还会由于操作系统写队列可写而触发写事件
                     key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+                    // 不管之前的事件集包含什么 本次写做完之后 将写事件移除
+                    // 因为此处不同于服务端
+                    // 会有 READ | WRITE
+                    // 以及 CONNECT | WRITE 共存
+                    // 所以无论什么样的事件集 只移除写事件
                 }
 
             }
@@ -84,7 +97,9 @@ public class Client {
 
         channel.configureBlocking(false);
 
-        // 此时注册写事件 触发读写轮回
+        // 此时关心写事件 触发读写轮回
+        // 因为客户端连接成功后
+        // 服务端和客户端 总要有一个人先开口 才能聊得起来
         channel.register(selector,
                 SelectionKey.OP_READ | SelectionKey.OP_WRITE,
                 "Client connect success, start talking...");
