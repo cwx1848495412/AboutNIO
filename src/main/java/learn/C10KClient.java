@@ -1,5 +1,6 @@
 package learn;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -33,5 +34,11 @@ public class C10KClient {
         }
 
         System.out.println("client size:" + list.size());
+
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
