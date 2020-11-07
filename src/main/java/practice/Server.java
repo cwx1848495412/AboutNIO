@@ -114,6 +114,9 @@ public class Server {
         // 将server 配置为非阻塞
         clientChannel.configureBlocking(false);
 
+        // 测试性能打印
+        System.out.println(clientChannel.socket().getInetAddress() + "--" + clientChannel.socket().getPort());
+
         // 且将本channel 注册到全局的selector上
         // 因为你本身已经监听了接受事件
         // 由你派生出来的channel 要处理的是你接受之后
