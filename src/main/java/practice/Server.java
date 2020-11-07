@@ -105,12 +105,12 @@ public class Server {
      */
     private void acceptHandler(SelectionKey key) throws Exception {
         System.out.println("acceptHandler.......");
-        // 有accept 事件了 可以确定一定有accept
-        // 这时调用阻塞的方法 去获取接受
-        // 因为事件已经有了  所以这个阻塞一经开启 必中 无需多于等待
         ServerSocketChannel serverSocket = (ServerSocketChannel) key.channel();
 
+        // 这一步是非阻塞的 没有会返回null
+        // 但是此代码中由于有accept 事件了 可以确定一定有accept
         SocketChannel clientChannel = serverSocket.accept();
+
         // 将server 配置为非阻塞
         clientChannel.configureBlocking(false);
 
